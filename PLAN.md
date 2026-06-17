@@ -1438,25 +1438,66 @@ At 100,000 MAU: ~$1,500–3,000/month — still manageable with subscription rev
 
 ---
 
-## 17. Open Questions & Decisions
+## 17. Resolved Decisions
 
-These need to be resolved before or during early development:
+All questions resolved on 2026-06-17.
 
-| # | Question | Options | Recommendation |
+| # | Question | Decision | Rationale |
 |---|---|---|---|
-| 1 | Primary AI provider for MVP? | OpenAI GPT-4o vs Anthropic Claude | Start with Anthropic Claude Sonnet; better tool use and safety behavior |
-| 2 | Web search provider? | Brave Search API vs Perplexity vs Serper | Brave Search API — cheapest, good quality, no AI markup |
-| 3 | Race API integration for MVP? | RunSignUp vs Race Roster vs defer to Phase 2 | Defer race search to Phase 2; MVP is shoes + training only |
-| 4 | Affiliate network for shoes? | Running Warehouse vs Amazon Associates vs direct | Running Warehouse first (highest commission, runner-specific), Amazon as fallback |
-| 5 | Anonymous rate limit enforcement? | IP-based vs session-cookie-based | Session cookie — easier to implement, IP is unreliable behind NAT/VPN |
-| 6 | Training plan export format for MVP? | PDF only vs Garmin Connect vs Strava | PDF only for MVP — simplest, sufficient |
-| 7 | Monorepo vs separate repos? | Nx monorepo vs separate Next.js + NestJS repos | Nx monorepo — shared types between frontend and backend, one CI pipeline |
-| 8 | Deployment platform for backend? | Railway vs Render vs Fly.io | Railway — simplest NestJS deployment, good DX |
-| 9 | How to handle shoe catalog initially? | Manual CSV import vs admin UI | Manual CSV import first — build admin UI in Phase 2 |
-| 10 | Free tier conversation limit? | 10/month vs 20/month vs unlimited with degraded model | 20 conversations/month with fast model; Pro gets standard model |
+| 1 | Primary AI provider for MVP? | **Provider-agnostic abstraction layer; provider TBD** | Build the interface now, wire in a specific provider later |
+| 2 | Web search provider? | **Brave Search API** | Cheapest, good quality, no AI markup on results |
+| 3 | Race API integration for MVP? | **Deferred to Phase 2** | MVP scope is shoes + training only |
+| 4 | Affiliate network for shoes? | **Running Warehouse (primary) + Amazon Associates (fallback)** | Highest commission in running-specific retail |
+| 5 | Anonymous rate limit enforcement? | **Session cookie** | IP is unreliable behind NAT/VPN |
+| 6 | Training plan export format for MVP? | **PDF only** | Simplest implementation; Garmin/Strava in Phase 2 |
+| 7 | Monorepo vs separate repos? | **Simple monorepo: `/frontend` + `/backend` + `/packages/types`** | Shared types without Nx overhead |
+| 8 | Deployment platform for backend? | **Railway** | Simplest NestJS deployment, good DX, $5/mo when needed |
+| 9 | How to handle shoe catalog initially? | **Manual CSV import** | Admin UI is Phase 2 |
+| 10 | Free tier conversation limit? | **20 conversations/month (fast model); Pro = unlimited (standard model)** | Enough to evaluate product; quality gate drives upgrades |
+
+---
+
+## 18. Repository Structure
+
+```
+runnersgarage/
+├── frontend/                  → Next.js 14 (App Router)
+│   ├── src/
+│   │   ├── app/               → Pages and layouts
+│   │   ├── components/        → UI components
+│   │   ├── hooks/             → Custom React hooks
+│   │   └── lib/               → API client, Supabase client
+│   ├── package.json
+│   └── tsconfig.json
+│
+├── backend/                   → NestJS
+│   ├── src/
+│   │   ├── auth/              → Auth guards and strategies
+│   │   ├── chat/              → Chat endpoint + SSE streaming
+│   │   ├── ai/                → AI provider abstraction + tools
+│   │   ├── profile/           → User profile CRUD
+│   │   ├── garage/            → Saved items CRUD
+│   │   ├── shoes/             → Shoe catalog queries
+│   │   └── common/            → Guards, pipes, interceptors
+│   ├── package.json
+│   └── tsconfig.json
+│
+├── packages/
+│   └── types/                 → Shared TypeScript types
+│       ├── src/
+│       │   ├── api/           → Request/response types
+│       │   ├── ai/            → Tool and provider types
+│       │   └── db/            → Entity types
+│       └── package.json
+│
+├── .env.example
+├── .gitignore
+├── package.json               → npm workspace root
+└── PLAN.md
+```
 
 ---
 
 *End of RunnersGarage Architecture Plan*
 
-*Next step: resolve Open Questions above, then begin implementation starting with project scaffolding.*
+*Status: All decisions resolved. Project scaffolded. Ready for implementation.*
